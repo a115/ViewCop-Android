@@ -5,6 +5,8 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include "AVS-ANPR.h"
+
 //#include "FindPlates.h"
 
 using namespace std;
@@ -13,7 +15,7 @@ using namespace cv;
 bool verifySizes(RotatedRect rectCandidatePlate);
 double LineLength(cv::Point *pt1, cv::Point *pt2);
 
-int FindPlates(Mat &imageSource, vector<Rect> &rectsNotRotated, vector<RotatedRect> &rectsRotated) {
+int FindPlates(Mat &imageSource, vector<Rect> &rectsNotRotated, vector<RotatedRect> &rectsRotated, Mat &imageDebug, int iDebugMode) {
     int iKey;
     Mat imageGray;
     Mat imageSobel;                     // Vertical lines only
@@ -41,8 +43,10 @@ int FindPlates(Mat &imageSource, vector<Rect> &rectsNotRotated, vector<RotatedRe
     cvtColor(imageSource, imageGray, CV_BGR2GRAY);
     blur(imageGray, imageGray, Size(5,5));
 #else
-    // On Android, already gray for some reason, so skip the convert and do the blur straight from source.
-    blur(imageSource, imageGray, Size(5,5));
+
+    cvtColor(imageSource, imageGray, CV_BGR2GRAY);
+    blur(imageGray, imageGray, Size(5,5));
+    //blur(imageSource, imageGray, Size(5,5));
 #endif // AVS_QT
     // By the time we get here, it's the same on both platforms.
 
@@ -52,6 +56,13 @@ int FindPlates(Mat &imageSource, vector<Rect> &rectsNotRotated, vector<RotatedRe
     //imshow("Gray", imageGray);
 
     Sobel(imageGray, imageSobel, CV_8U, 1, 0, 3, 1, 0);
+    //Sobel(imageGray, imageSobel, , 1, 0, 3, 1, 0);
+
+    if (iDebugMode == AVS_DEBUG_MODE_DISPLAY_SOBEL) {
+    	// Need to convert it to colour before we can copy it
+    	cvtColor(imageSobel, imageDebug, CV_GRAY2BGRA);  // Converts and copies in one go
+        }
+
 #ifdef AVS_QT
     imshow("Sobel", imageSobel);
 #endif // AVS_QT
@@ -63,6 +74,11 @@ int FindPlates(Mat &imageSource, vector<Rect> &rectsNotRotated, vector<RotatedRe
 #endif // AVS_QT
 
     morphologyEx(imageThreshold, imageMorph, CV_MOP_CLOSE, element);
+
+    if (iDebugMode == AVS_DEBUG_MODE_DISPLAY_MORPH) {
+    	// Need to convert it to colour before we can copy it
+    	cvtColor(imageMorph, imageDebug, CV_GRAY2BGRA);  // Converts and copies in one go
+        }
 
 #ifdef AVS_QT
     imshow("Morph", imageMorph);
@@ -154,7 +170,9 @@ void FindLargestPlate(vector<RotatedRect> &rectsRotated, RotatedRect &rotatedrec
 
         Point2f points[4];
 
-        rectsRotated[i].points(points); // Get the points
+        RotatedRect rotatedrectTemp = rectsRotated[i];
+        rotatedrectTemp.points(points); // Get the points
+        //rectsRotated[i].points(points); // Get the points
         // boundingRect needs it as a vector (or Mat*)
         vector<Point> vectorPoints;
         vectorPoints.push_back(points[0]);
@@ -175,6 +193,8 @@ void FindLargestPlate(vector<RotatedRect> &rectsRotated, RotatedRect &rotatedrec
     rotatedrectLargestPlate = rectsRotated[max_rect_idx];
 
     }
+
+//#ifdef OUT_FOR_NOW
 
 Mat DerotateAndCorrectPerspective(Mat &imageSource, RotatedRect &rectRotated) {
     Mat imageDerotatedAndCorrected;
@@ -318,7 +338,7 @@ Mat DerotateAndCorrectPerspective(Mat &imageSource, RotatedRect &rectRotated) {
 
     // Crop the new image to the correct size
 
-    //imageCropped.create(imageSource.size(), imageSource.depth());
+    imageCropped.create(imageSource.size(), imageSource.depth());
     imageCropped.create(Size((int) fDestWidth, (int) fDestHeight), imageSource.depth());
 
     printf("dst[0].x = %d, dst[0].y = %d, fDestWidth = %d, fDestHeight = %d\n", (int) dst[0].x, (int) dst[0].y, (int) fDestWidth, (int) fDestHeight);
@@ -350,3 +370,4 @@ Mat DerotateAndCorrectPerspective(Mat &imageSource, RotatedRect &rectRotated) {
 double LineLength(cv::Point *pt1, cv::Point *pt2) {
     return (   sqrt((double) pow((float)(pt1->x - pt2->x), 2) + pow((float)(pt1->y - pt2->y), 2))  );
     }
+//#endif // OUT_FOR_NOW

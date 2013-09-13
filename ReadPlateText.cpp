@@ -17,6 +17,7 @@ using namespace cv;
 #ifdef AVS_TESSERACT
 tesseract::TessBaseAPI *api;
 
+
 int AVS_InitTesseract(void) {
      api = new tesseract::TessBaseAPI();
 
