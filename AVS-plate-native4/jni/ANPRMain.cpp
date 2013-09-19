@@ -39,7 +39,7 @@ double LineLength(cv::Point *pt1, cv::Point *pt2);
 //
 ///////////////////////////////////////////////////////////////////////
 
-int ANPRMain(Mat &imageSource, int iDebugMode) {
+int ANPRMain(Mat &imageSource, Mat &imagePlate, int iDebugMode) {
 
     vector< vector< Point> > contours;
     vector<Rect> rectsNotRotated;
@@ -51,7 +51,6 @@ int ANPRMain(Mat &imageSource, int iDebugMode) {
     char szUniquePart[100];
     char szDebugImageFilename[100];
     int iKey;
-
     Mat imageDebug;
 
     imageSource.copyTo(imageDebug);
@@ -149,9 +148,17 @@ int ANPRMain(Mat &imageSource, int iDebugMode) {
     Rect roi(Point(0,0), imagePlateLoc.size());
     //imagePlateLoc.copyTo(imageDebug(roi));
 
-    //if (iDebugMode == 3) {
+    if (iDebugMode == AVS_DEBUG_MODE_DISPLAY_PLATE) {
+    	// Return a full size image, but with just the plate in the TLH corner,
+    	// and the rest of the image blacked out.  Later, we'll return just the
+    	// plate itself.
+    	imageDebug.setTo(0);
+
+//        imagePlateLoc.copyTo(imageSource);
+        }
     imageDebug.copyTo(imageSource);
-        //}
+
+    imagePlate = imagePlateLoc;
 
     // Copy the plate onto the source image (or whichever debug is chosen) - this
     // could be optional later.

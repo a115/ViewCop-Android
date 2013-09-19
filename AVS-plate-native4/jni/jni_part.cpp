@@ -27,15 +27,16 @@ JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial2_Tutorial2Activity_FindF
     }
 }
 
-JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial2_Tutorial2Activity_ANPR(JNIEnv*, jobject, jlong addrRgba, jint ijDebugMode);
+JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial2_Tutorial2Activity_ANPR(JNIEnv*, jobject, jlong addrRgba, jlong addrPlateOnly, jint ijDebugMode);
 
-JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial2_Tutorial2Activity_ANPR(JNIEnv*, jobject, jlong addrRgba, jint ijDebugMode)
+JNIEXPORT void JNICALL Java_org_opencv_samples_tutorial2_Tutorial2Activity_ANPR(JNIEnv*, jobject, jlong addrRgba, jlong addrPlateOnly, jint ijDebugMode)
 {
 //    Mat& mGr  = *(Mat*)addrGray;
     Mat& mRgb = *(Mat*)addrRgba;
+    Mat& mPlateOnly = *(Mat*)addrPlateOnly;
     vector<KeyPoint> v;
 
-    ANPRMain(mRgb, ijDebugMode);
+    ANPRMain(mRgb, mPlateOnly, ijDebugMode);
 
 }
 

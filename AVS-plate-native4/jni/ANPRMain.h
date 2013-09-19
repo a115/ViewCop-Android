@@ -7,6 +7,6 @@
 
 using namespace cv;
 
-int ANPRMain(Mat &imageSource, int iDebugMode);
+int ANPRMain(Mat &imageSource, Mat &imagePlate, int iDebugMode);
 
 #endif // ANPRMAIN_H
