@@ -1,0 +1,68 @@
+ANPR prototype project for Android
+----------------------------------
+
+Development environment
+-----------------------
+
+Any Android development environment can be used - the choices seem 
+to be Eclipse, or Android Studio.  Android Studio is currently described as 
+'Early Access Preview', and didn't exist at all when we started this project,
+so we are using Eclipse.  The project could be ported to Android Studio later
+on if needed, as that may end up being the better platform eventually.  Eclipse is quite
+long-winded, especially to set up.
+
+The Eclipse setup was done as per the instructions at 
+http://docs.opencv.org/doc/tutorials/introduction/android_binary_package/android_dev_intro.html
+
+Specific notes:
+
+- I did the 'Manual Setup':  Follow steps 1-8.
+- I did the 'Native development in C++':  Follow the steps.
+- I have done the 'Building application native part from the command line', but only for 
+  Tesseract, which is now obsolete to this project.
+- The main part of the project uses the 'Building application native part from Eclipse' instructions - 
+  follow steps 1-10.
+- Under 'Debugging and Testing', I did *not* use Virtual Devices for this project - I used a variety 
+  of hardware devices.
+- None of my devices were automatically recognised, so I had to do steps 1-17 under 'Windows host 
+  computer' for each device.
+
+I then followed the link from the end of those instructions, to 
+http://docs.opencv.org/doc/tutorials/introduction/android_binary_package/O4A_SDK.html#o4a-sdk
+and continued there.  
+
+- I did *not* use the Tegra pack, and instead did the 'Manual OpenCV4Android SDK Setup'.
+
+Then followed the link from there to 
+http://docs.opencv.org/doc/tutorials/introduction/android_binary_package/dev_with_OCV_on_Android.html#dev-with-ocv-on-android
+and continued.  However, the easiest way to get started with a new project (which is what I did with
+the prototype so far) is to copy an existing project, as follows:
+
+- In 'Package Explorer', right click on a project - I used 'OpenCV Tutorial 2', as it uses mixed Java 
+  and C++, which we need for this project - select 'Copy', then 'Paste' to get a new copy of the project.
+- I then started the modifications needed for our specific project.
+- Note that because the project originally copied from the 'tutorial 2' project, some of the object names
+  still reflect that, but could of course be renamed later.  The idea was to get something working as 
+  quickly as possible.
+
+Project-specific notes
+----------------------
+
+The code in this project is split into two main areas:
+- The Java code, handling the basic UI and the interface with Android, is stored in
+  AVS-plate-native5/src/org.opencv.samples.tutorial2/TutorialActivity2.java
+- The C/C++ code, where all of the computer vision work is done, is stored in 
+  AVS-plate-native5/jni
+  The files are briefly as follows:
+  ANPRMain.h/.cpp       - contains the 'ANPRMain' function, which is called from the Java code.
+  ANPRTest.h/.cpp       - *obsolete*
+  AVS-ANPR.h            - header file for project specific stuff
+  FindPlates.h/.cpp     - code to find number plates in an image, and supporting functions to 
+                          rotate, correct perspective, etc.
+                          
+Tesseract
+---------
+
+The compilation and installation of Tesseract was even more time-consuming, especially the first 
+time round.  However, as we have agreed that is now obsolete to the project, I won't spend time 
+documenting it here. 
